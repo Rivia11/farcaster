@@ -1,1 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glazer Chaos Frame</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom Tailwind Configuration for Glitch Effect and Colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'chaos-dark': '#0a0117',
+                        'chaos-purple': '#2e0057',
+                        'chaos-cyan': '#00ffc2',
+                        'chaos-magenta': '#ff0099',
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'neon-cyan': '0 0 8px #00ffc2, 0 0 15px #00ffc2',
+                        'neon-magenta': '0 0 8px #ff0099, 0 0 15px #ff0099',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Base Styling */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 0.5rem;
+        }
+
+        /* Glitch Text Effect */
+        .glitch-text {
+            animation: glitch-anim 2s infinite alternate-reverse linear;
+            text-shadow: 
+                0.8px 0.8px 0 #00ffc2, 
+                -0.8px -0.8px 0 #ff0099;
+        }
+
+        /* Glitch Animation Keyframes */
+        @keyframes glitch-anim {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(2px, -1px); }
+            50% { transform: translate(-1px, 1px); }
+            75% { transform: translate(1px, 0); }
+            100% { transform: translate(-2px, 0); }
+        }
+
+        /* Glaze Button Styling */
+        .glaze-button {
+            transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+            /* Use gradient for extra appeal */
+            background-image: linear-gradient(90deg, #ff0099, #6a00c7);
+            box-shadow: 0 4px 0 0 #3a006c;
+        }
+        .glaze-button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 0 #3a006c;
+            background-image: linear-gradient(90deg, #ff0099, #4f0099);
+        }
+        
+        /* Aspect Ratio Container for the Media */
+        .aspect-ratio-box {
+            position: relative;
+            width: 100%;
+            /* 1.91:1 Aspect Ratio (Farcaster Standard) */
+            height: 0;
+            padding-bottom: 52.36%; 
+        }
+
+        /* Content inside the aspect ratio box must be absolutely positioned */
+        .aspect-ratio-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Video specific styles */
+        .aspect-ratio-content video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<!-- App Container: Locked to max-w-xs (Extra Small) and enhanced design -->
+<div id="app-container" class="w-full max-w-xs bg-chaos-dark p-3 rounded-xl border-2 border-chaos-cyan/80 shadow-neon-cyan/50">
+    <!-- Header/Title -->
+    <div class="flex justify-between items-center mb-3 border-b border-chaos-purple pb-2">
+        <h1 class="text-3xl font-extrabold glitch-text text-white">GLAZER CHAOS</h1>
+        <div class="flex items-center space-x-1.5">
+            <span id="current-user-fid" class="text-xs font-bold text-chaos-cyan">FID: 12345</span>
+            <div class="w-5 h-5 rounded-full bg-chaos-magenta shadow-neon-magenta/80"></div>
+        </div>
+    </div>
+    
+    <!-- Top Stats Panel (Compact) -->
+    <div class="flex space-x-2 mb-3">
+        <!-- KING GLAZER (Dynamic based on Farcaster context) -->
+        <div class="flex-1 bg-chaos-purple p-2 rounded-lg border border-chaos-cyan/50">
+            <p class="text-[10px] font-semibold text-gray-300 uppercase mb-0.5 tracking-wider">KING GLAZER</p>
+            <div class="flex flex-col space-y-0.5">
+                <span id="king-fid" class="text-lg font-mono text-chaos-magenta leading-none drop-shadow">F8</span>
+                <span id="king-wallet" class="text-[10px] font-mono text-white truncate leading-none">0xF8AD...42D8</span>
+            </div>
+        </div>
+        <!-- GLAZED COUNT -->
+        <div class="flex-1 bg-chaos-purple p-2 rounded-lg border border-chaos-cyan/50">
+            <p class="text-[10px] font-semibold text-gray-300 uppercase mb-0.5 tracking-wider">GLAZED</p>
+            <div class="flex items-center space-x-1">
+                <span class="text-2xl" role="img" aria-label="Donut">🍩</span>
+                <span id="glazed-count" class="text-2xl font-bold text-chaos-cyan shadow-neon-cyan/50">140</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Central Media Container (Fixed Aspect Ratio) - Now holds the video -->
+    <div id="media-container" class="aspect-ratio-box rounded-lg overflow-hidden mb-3 border-2 border-chaos-magenta/70">
+        <div class="aspect-ratio-content">
+            <!-- The video element using the uploaded file -->
+            <video id="chaos-video" autoplay loop muted playsinline>
+                <source src="uploaded:Factory_Donut_Fun_Video.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    </div>
+
+    <!-- Middle Stats Row -->
+    <div class="flex space-x-2 mb-4">
+        <!-- CHAOS RATE -->
+        <div class="flex-1 bg-chaos-dark p-2 rounded-lg border border-chaos-magenta/50">
+            <p class="text-[10px] font-semibold text-gray-400 uppercase mb-0.5 tracking-wider">CHAOS RATE</p>
+            <div class="flex items-center space-x-1">
+                <span class="text-lg font-bold text-chaos-magenta drop-shadow">10</span>
+                <span class="text-xs text-gray-400">/ block</span>
+            </div>
+        </div>
+        <!-- GLAZE PRICE -->
+        <div class="flex-1 bg-chaos-dark p-2 rounded-lg border border-chaos-magenta/50">
+            <p class="text-[10px] font-semibold text-gray-400 uppercase mb-0.5 tracking-wider">GLAZE PRICE</p>
+            <div class="text-lg font-mono text-chaos-cyan drop-shadow">Ξ0.00019</div>
+        </div>
+    </div>
+
+    <!-- Main Action Button -->
+    <button id="glaze-button" onclick="glazeAction()"
+        class="glaze-button w-full py-3 text-white font-extrabold rounded-lg uppercase tracking-widest text-base mb-3 hover:opacity-90">
+        CHAOS GLAZE
+    </button>
+
+    <!-- Balances and Footer Info -->
+    <div class="text-xs font-mono text-gray-300 mb-2 border-t border-chaos-purple pt-2 mt-2">YOUR BALANCES</div>
+    <div class="flex justify-between items-center mb-3">
+        <div class="flex items-center space-x-1.5">
+            <span class="text-xl" role="img" aria-label="Donut">🍩</span>
+            <span id="donut-balance" class="text-lg font-bold text-white">478,300</span>
+        </div>
+        <div class="text-lg font-mono text-chaos-cyan drop-shadow">Ξ0.0327</div>
+    </div>
+
+    <!-- Disclaimer/Rule Text -->
+    <p class="text-xs text-center text-gray-500 pt-1">
+        <span class="text-chaos-magenta">*</span> Pay the Glaze price to become the **King Glazer**. Earn <span class="text-chaos-cyan">$CHAOS</span> every block until another user initiates the Glaze.
+    </p>
+
+</div>
+
+<script type="text/javascript">
+    // --- Farcaster Context Helper Functions ---
+    function getFarcasterContext() {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Mock data to simulate the user who clicks/views the frame
+        const mockContext = {
+            fid: urlParams.get('fid') || 12345, // Farcaster ID
+            username: urlParams.get('username') || 'ChaosGlazer',
+            wallet: urlParams.get('wallet') || '0x43aD...33B1', // Shortened address
+        };
+        
+        return mockContext;
+    }
+
+    function updateFarcasterUser(context) {
+        const userFidElement = document.getElementById('current-user-fid');
+        if (userFidElement) {
+            userFidElement.textContent = `FID: ${context.fid}`;
+        }
+        const kingFidElement = document.getElementById('king-fid');
+        const kingWalletElement = document.getElementById('king-wallet');
+
+        if (kingFidElement) kingFidElement.textContent = `F${context.fid}`;
+        if (kingWalletElement) kingWalletElement.textContent = context.wallet;
+    }
+
+
+    // --- State and Rendering Logic ---
+
+    let glazedCount = 140;
+    const glazedCountElement = document.getElementById('glazed-count');
+    
+    function glazeAction() {
+        glazedCount += Math.floor(Math.random() * 5) + 1; 
+
+        if (glazedCountElement) {
+            glazedCountElement.textContent = glazedCount.toLocaleString();
+            
+            // Add a temporary visual feedback class
+            glazedCountElement.classList.add('glitch-text');
+            
+            // Remove the visual feedback after a short delay
+            setTimeout(() => {
+                glazedCountElement.classList.remove('glitch-text');
+            }, 300);
+        }
+        
+        console.log(`Chaos Glazed! New count: ${glazedCount}`);
+    }
+
+    // Initial load check
+    window.onload = function() {
+        const context = getFarcasterContext();
+        updateFarcasterUser(context);
+
+        if (glazedCountElement) {
+            glazedCountElement.textContent = glazedCount.toLocaleString();
+        }
+        
+        // Since we are using a video now, we don't need loadChaosImage()
+        // We can ensure the video starts playing if possible
+        const videoElement = document.getElementById('chaos-video');
+        if (videoElement) {
+            videoElement.play().catch(error => {
+                console.log("Video autoplay prevented. Frame will continue to load.");
+            });
+        }
+    };
+</script>
+
+</body>
+</html>
 
