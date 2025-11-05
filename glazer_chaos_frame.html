@@ -3,516 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glazer Chaos Frame</title>
-    <!-- Load Tailwind CSS -->
+    <title>Glazer Chaos - Simple Frame</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Farcaster Frame Meta Tags (MANDATORY FOR WEB3) -->
-    <!-- ACTION: Base transaction must be initiated to the Auction contract -->
-    <!-- NOTE: Replace 'https://your-vercel-app.vercel.app' with your actual deployed Vercel URL -->
+    <!-- FARCASTER FRAME META TAGS -->
+    <!-- These are what Farcaster reads to display your frame -->
     <meta property="fc:frame" content="vNext" />
-    <meta property="fc:frame:image" content="https://placehold.co/600x314/0a0117/ff0099?text=CHAOS+GLAZER+INIT" />
-    <meta property="fc:frame:post_url" content="https://your-vercel-app.vercel.app/api/frame" />
+    <meta property="fc:frame:image" content="https://placehold.co/600x314/0a0117/ff0099?text=GLAZER+CHAOS+FRAME" />
+    <meta property="fc:frame:image:aspect_ratio" content="1.91:1" />
     
-    <!-- Button 1: The Transaction Button -->
-    <meta property="fc:frame:button:1" content="CHAOS GLAZE (Initiate TX)" />
+    <!-- Transaction Button - This triggers the wallet -->
+    <meta property="fc:frame:button:1" content="🍩 CHAOS GLAZE (0.00019 ETH)" />
     <meta property="fc:frame:button:1:action" content="tx" />
+    <meta property="fc:frame:button:1:target" content="https://simple-frame-txdata.vercel.app/api/tx" />
     
-    <!-- TARGET: This URL will return the transaction data JSON for the contract call (Serverless Function #1) -->
-    <meta property="fc:frame:button:1:target" content="https://your-vercel-app.vercel.app/api/glaze-tx-data" /> 
+    <!-- Info Button -->
+    <meta property="fc:frame:button:2" content="ℹ️ How It Works" />
+    <meta property="fc:frame:button:2:action" content="link" />
+    <meta property="fc:frame:button:2:target" content="https://your-info-page.com" />
 
-    <!-- Button 2: Post-Transaction Follow-up (Serverless Function #2) -->
-    <meta property="fc:frame:button:2" content="Confirm Glaze Status" />
-    <meta property="fc:frame:button:2:action" content="post" />
-    <meta property="fc:frame:button:2:target" content="https://your-vercel-app.vercel.app/api/update-status" />
-    
-    <!-- Load Firebase Modules -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, 
-            signInAnonymously, 
-            signInWithCustomToken, 
-            onAuthStateChanged 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { 
-            getFirestore, 
-            doc, 
-            setDoc, 
-            onSnapshot, 
-            runTransaction, 
-            serverTimestamp 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app-check.js";
-        
-        // Expose Firebase functions to the global scope for use in the script tag
-        window.firebase = {
-            initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged,
-            getFirestore, doc, setDoc, onSnapshot, runTransaction, serverTimestamp, setLogLevel
-        };
-    </script>
+    <!-- Open Graph (for sharing) -->
+    <meta property="og:title" content="Glazer Chaos - King of the Glaze" />
+    <meta property="og:description" content="Become the King Glazer and earn DONUTS!" />
+    <meta property="og:image" content="https://placehold.co/600x314/0a0117/ff0099?text=GLAZER+CHAOS+FRAME" />
 
-    <!-- Custom Tailwind Configuration for Glitch Effect and Colors -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'chaos-dark': '#0a0117',
-                        'chaos-purple': '#2e0057',
-                        'chaos-cyan': '#00ffc2',
-                        'chaos-magenta': '#ff0099',
-                    },
-                    fontFamily: {
-                        'inter': ['Inter', 'sans-serif'],
-                    },
-                    boxShadow: {
-                        'neon-cyan': '0 0 8px #00ffc2, 0 0 15px #00ffc2',
-                        'neon-magenta': '0 0 8px #ff0099, 0 0 15px #ff0099',
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        /* Base Styling */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #000000;
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0a0117 0%, #2e0057 100%);
             color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             min-height: 100vh;
-            padding: 0.5rem;
-        }
-
-        /* Glitch Text Effect */
-        .glitch-text {
-            animation: glitch-anim 0.3s infinite alternate-reverse linear; /* Made faster for quick feedback */
-            text-shadow: 
-                0.8px 0.8px 0 #00ffc2, 
-                -0.8px -0.8px 0 #ff0099;
-        }
-
-        /* Glitch Animation Keyframes */
-        @keyframes glitch-anim {
-            0% { transform: translate(0, 0); }
-            50% { transform: translate(-1px, 1px); }
-            100% { transform: translate(-2px, 0); }
-        }
-
-        /* Glaze Button Styling */
-        .glaze-button {
-            transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
-            /* Use gradient for extra appeal */
-            background-image: linear-gradient(90deg, #ff0099, #6a00c7);
-            box-shadow: 0 4px 0 0 #3a006c;
-        }
-        .glaze-button:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 0 0 #3a006c;
-            background-image: linear-gradient(90deg, #ff0099, #4f0099);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
         }
         
-        /* Aspect Ratio Container for the Media */
-        .aspect-ratio-box {
-            position: relative;
-            width: 100%;
-            /* 1.91:1 Aspect Ratio (Farcaster Standard) */
-            height: 0;
-            padding-bottom: 52.36%; 
+        .container {
+            max-width: 600px;
+            background: rgba(10, 1, 23, 0.9);
+            border: 2px solid #00ffc2;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 0 30px rgba(0, 255, 194, 0.3);
         }
-
-        /* Content inside the aspect ratio box must be absolutely positioned */
-        .aspect-ratio-content {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #000; /* Fallback background */
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, #00ffc2, #ff0099);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 2s infinite;
         }
-
-        /* Image specific styles: MUST fill the container */
-        .aspect-ratio-content img {
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .info-box {
+            background: rgba(46, 0, 87, 0.5);
+            border: 1px solid #ff0099;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .button {
+            background: linear-gradient(90deg, #ff0099, #6a00c7);
+            color: white;
+            font-weight: bold;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
             width: 100%;
-            height: 100%;
-            object-fit: cover; /* Ensures image covers the entire container */
-            display: block;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+        }
+        
+        .button:hover {
+            transform: scale(1.05);
+        }
+        
+        .link {
+            color: #00ffc2;
+            text-decoration: none;
+            border-bottom: 1px dashed #00ffc2;
+        }
+        
+        .link:hover {
+            color: #ff0099;
+            border-bottom-color: #ff0099;
         }
     </style>
 </head>
 <body>
-
-<!-- App Container: Locked to max-w-xs (Extra Small) and enhanced design -->
-<div id="app-container" class="w-full max-w-xs bg-chaos-dark p-3 rounded-xl border-2 border-chaos-cyan/80 shadow-neon-cyan/50">
-    
-    <!-- Loading Indicator/Error Message Box -->
-    <div id="status-box" class="mb-3 p-2 text-center text-sm font-semibold rounded-lg bg-chaos-purple border border-chaos-magenta/50 hidden">
-        <span id="status-message">Initializing Chaos...</span>
-    </div>
-
-    <!-- Header/Title -->
-    <div class="flex justify-between items-center mb-3 border-b border-chaos-purple pb-2">
-        <h1 class="text-3xl font-extrabold glitch-text text-white">GLAZER CHAOS</h1>
-        <div class="flex items-center space-x-1.5">
-            <span id="current-user-fid" class="text-xs font-bold text-chaos-cyan">FID: INIT</span>
-            <div id="user-status-dot" class="w-5 h-5 rounded-full bg-red-600 shadow-neon-magenta/80"></div>
-        </div>
-    </div>
-    
-    <!-- Top Stats Panel (Compact) -->
-    <div class="flex space-x-2 mb-3">
-        <!-- KING GLAZER (Dynamic based on Firestore) -->
-        <div class="flex-1 bg-chaos-purple p-2 rounded-lg border border-chaos-cyan/50">
-            <p class="text-[10px] font-semibold text-gray-300 uppercase mb-0.5 tracking-wider">KING GLAZER</p>
-            <div class="flex flex-col space-y-0.5">
-                <span id="king-fid" class="text-lg font-mono text-chaos-magenta leading-none drop-shadow">F_</span>
-                <span id="king-wallet" class="text-[10px] font-mono text-white truncate leading-none">0x...</span>
-            </div>
-        </div>
-        <!-- GLAZED COUNT -->
-        <div class="flex-1 bg-chaos-purple p-2 rounded-lg border border-chaos-cyan/50">
-            <p class="text-[10px] font-semibold text-gray-300 uppercase mb-0.5 tracking-wider">GLAZED</p>
-            <div class="flex items-center space-x-1">
-                <span class="text-2xl" role="img" aria-label="Donut">🍩</span>
-                <span id="glazed-count" class="text-2xl font-bold text-chaos-cyan shadow-neon-cyan/50">0</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Central Media Container (Fixed Aspect Ratio) - Now a reliable static image placeholder -->
-    <div id="media-container" class="aspect-ratio-box rounded-lg overflow-hidden mb-3 border-2 border-chaos-magenta/70">
-        <div id="media-content" class="aspect-ratio-content">
-            <!-- Best practice: Use a static image for reliability in Farcaster Frames -->
-            <img src="https://placehold.co/600x314/0a0117/ff0099?text=STATIC+GLAZE+SIGNAL" 
-                alt="Static Glaze Signal Placeholder"
-                class="w-full h-full object-cover">
-        </div>
-    </div>
-
-    <!-- Middle Stats Row -->
-    <div class="flex space-x-2 mb-4">
-        <!-- CHAOS RATE -->
-        <div class="flex-1 bg-chaos-dark p-2 rounded-lg border border-chaos-magenta/50">
-            <p class="text-[10px] font-semibold text-gray-400 uppercase mb-0.5 tracking-wider">CHAOS RATE</p>
-            <div class="flex items-center space-x-1">
-                <span class="text-lg font-bold text-chaos-magenta drop-shadow">10</span>
-                <span class="text-xs text-gray-400">/ block</span>
-            </div>
-        </div>
-        <!-- GLAZE PRICE -->
-        <div class="flex-1 bg-chaos-dark p-2 rounded-lg border border-chaos-magenta/50">
-            <p class="text-[10px] font-semibold text-gray-400 uppercase mb-0.5 tracking-wider">GLAZE PRICE</p>
-            <div id="glaze-price" class="text-lg font-mono text-chaos-cyan drop-shadow">Ξ0.00019</div>
-        </div>
-    </div>
-
-    <!-- Main Action Button -->
-    <!-- The onclick handler is now only for local preview/simulation. The real action is handled by Farcaster meta tags. -->
-    <button id="glaze-button" onclick="glazeAction()" disabled
-        class="glaze-button w-full py-3 text-white font-extrabold rounded-lg uppercase tracking-widest text-base mb-3 opacity-50 cursor-not-allowed">
-        CONNECTING...
-    </button>
-
-    <!-- Balances and Footer Info -->
-    <div class="text-xs font-mono text-gray-300 mb-2 border-t border-chaos-purple pt-2 mt-2">YOUR BALANCES</div>
-    <div class="flex justify-between items-center mb-3">
-        <div class="flex items-center space-x-1.5">
-            <span class="text-xl" role="img" aria-label="Donut">🍩</span>
-            <span id="donut-balance" class="text-lg font-bold text-white">0</span>
-        </div>
-        <div id="eth-balance" class="text-lg font-mono text-chaos-cyan drop-shadow">Ξ0.0000</div>
-    </div>
-
-    <!-- Disclaimer/Rule Text -->
-    <p class="text-xs text-center text-gray-500 pt-1">
-        <span class="text-chaos-magenta">*</span> Pay the Glaze price to become the **King Glazer**. **Earn DONUTS** every block until another user initiates the Glaze.
-    </p>
-    
-    <!-- Real Contract Information (For Server Reference) -->
-    <div class="text-[8px] text-gray-600 text-center mt-3 pt-2 border-t border-chaos-purple/30">
-        <p>
-            **Glaze Auction Contract (Base Mainnet):** <span class="text-chaos-cyan font-bold">0xA0Da470d4612B1B90E96Ad43611b4C1534c7a884</span>
-        </p>
-        <p>
-            **Function Signature (Requires Server Encoding):** <span class="text-chaos-magenta font-bold">buy(address[] assets, address assetsReceiver, uint256 epochId, uint256 deadline, uint256 maxPaymentTokenAmount)</span>
-        </p>
-        <p class="mt-1 text-chaos-magenta">
-            *Your server must query this contract for the current price and epochId before encoding the transaction.*
-        </p>
-    </div>
-
-</div>
-
-<script>
-    // Global Firebase/State variables
-    let db, auth;
-    let currentUserId = null;
-    let farcasterContext = {};
-    const globalStatePath = (appId) => `artifacts/${appId}/public/data/chaos_glazer/global_state`;
-    const userProfilePath = (appId, userId) => `artifacts/${appId}/users/${userId}/chaos_glazer/profile`;
-
-    // --- Utility Functions ---
-
-    /** Displays a temporary status message in the dedicated box. */
-    function showStatus(message, isError = false) {
-        const statusBox = document.getElementById('status-box');
-        const statusMessage = document.getElementById('status-message');
-        statusMessage.textContent = message;
+    <div class="container">
+        <h1>🍩 GLAZER CHAOS</h1>
         
-        statusBox.classList.remove('hidden', 'bg-red-900/50', 'bg-chaos-purple');
-        if (isError) {
-            statusBox.classList.add('bg-red-900/50', 'border-red-500');
+        <div class="info-box">
+            <h2 style="color: #00ffc2; font-size: 1.5rem; margin-bottom: 0.5rem;">How It Works</h2>
+            <ol style="margin-left: 1.5rem; line-height: 1.8;">
+                <li>Pay 0.00019 ETH to become the <strong>King Glazer</strong> 👑</li>
+                <li>Earn <strong>DONUTS</strong> every block while you're king 🍩</li>
+                <li>Stay king until someone else glazes</li>
+                <li>Compete for the top spot!</li>
+            </ol>
+        </div>
+
+        <div class="info-box">
+            <h3 style="color: #ff0099; font-size: 1.2rem; margin-bottom: 0.5rem;">📊 Current Status</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                <div>
+                    <p style="font-size: 0.8rem; color: #ccc;">King Glazer</p>
+                    <p style="font-size: 1.2rem; color: #00ffc2; font-weight: bold;">F8</p>
+                </div>
+                <div>
+                    <p style="font-size: 0.8rem; color: #ccc;">Total Glazed</p>
+                    <p style="font-size: 1.2rem; color: #ff0099; font-weight: bold;">140</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box" style="background: rgba(255, 0, 153, 0.1); border-color: #ff0099;">
+            <p style="text-align: center; margin: 0;">
+                <strong>🎯 To play:</strong> Cast this frame in Warpcast or Supercast!
+            </p>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem;">
+            <p style="font-size: 0.9rem; color: #999;">
+                Contract: <code style="color: #00ffc2;">0xA0Da...a884</code><br>
+                Network: <span style="color: #ff0099;">Base Mainnet</span>
+            </p>
+        </div>
+
+        <div style="margin-top: 2rem; text-align: center; font-size: 0.8rem; color: #666;">
+            <p>
+                <strong>Note:</strong> This page shows information about the frame.<br>
+                To interact, cast the frame URL in Farcaster!
+            </p>
+        </div>
+
+        <div style="margin-top: 2rem;">
+            <a href="https://warpcast.com" target="_blank">
+                <button class="button">🚀 Open Warpcast</button>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Simple script to detect if viewed in Farcaster
+        if (window.location !== window.parent.location) {
+            console.log('Frame is embedded - Farcaster will handle interactions');
         } else {
-            statusBox.classList.add('bg-chaos-purple', 'border-chaos-magenta/50');
+            console.log('Frame viewed directly - Cast URL in Farcaster to interact');
         }
-        statusBox.classList.remove('opacity-0');
-        
-        // Hide after 3 seconds unless it's an error
-        if (!isError) {
-            setTimeout(() => {
-                statusBox.classList.add('hidden');
-            }, 3000);
-        }
-    }
-
-    /** Helper to format truncated wallet address */
-    function formatWallet(address) {
-        if (!address) return '0x...';
-        return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
-    }
-
-    // --- Farcaster Context Helper Functions ---
-    // These functions simulate receiving user data from the Farcaster frame environment.
-    function getFarcasterContext() {
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        // Mock data to simulate the user who clicks/views the frame
-        const mockContext = {
-            fid: urlParams.get('fid') || '12345', // Farcaster ID
-            username: urlParams.get('username') || 'ChaosGlazer',
-            wallet: urlParams.get('wallet') || '0x43aD55Bf1234567890fFa33B1', // Full address for storage
-        };
-        
-        return mockContext;
-    }
-
-    function updateFarcasterUserUI(context, userId) {
-        const userFidElement = document.getElementById('current-user-fid');
-        // Now displaying the full userId for debugging
-        if (userFidElement) {
-            userFidElement.textContent = `UID: ${userId}`;
-        }
-    }
-
-    // --- Firebase Initialization and Auth ---
-
-    async function initializeFirebase() {
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        if (!firebaseConfig) {
-            showStatus("ERROR: Firebase Config Missing.", true);
-            return;
-        }
-
-        try {
-            // Initialize Firebase App and Services
-            const app = firebase.initializeApp(firebaseConfig);
-            db = firebase.getFirestore(app);
-            auth = firebase.getAuth(app);
-            // Log for debugging in the canvas environment
-            firebase.setLogLevel('Debug'); 
-            
-            // Authentication
-            const authPromise = new Promise((resolve) => {
-                firebase.onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        currentUserId = user.uid;
-                        resolve();
-                    }
-                });
-
-                if (initialAuthToken) {
-                    firebase.signInWithCustomToken(auth, initialAuthToken).catch(e => {
-                        console.error("Custom Token Sign In Failed:", e);
-                        firebase.signInAnonymously(auth).catch(e2 => {
-                            console.error("Anonymous Sign In Failed:", e2);
-                            showStatus("ERROR: Authentication failed.", true);
-                        });
-                    });
-                } else {
-                    firebase.signInAnonymously(auth).catch(e => {
-                        console.error("Anonymous Sign In Failed:", e);
-                        showStatus("ERROR: Authentication failed.", true);
-                    });
-                }
-            });
-
-            await authPromise;
-            
-            // Authentication successful, start listeners
-            document.getElementById('user-status-dot').classList.remove('bg-red-600');
-            document.getElementById('user-status-dot').classList.add('bg-chaos-cyan');
-            
-            farcasterContext = getFarcasterContext();
-            updateFarcasterUserUI(farcasterContext, currentUserId);
-            
-            listenToGlobalState(appId);
-            listenToUserProfile(appId, currentUserId);
-            
-            const glazeButton = document.getElementById('glaze-button');
-            glazeButton.textContent = "CHAOS GLAZE (Local Test)";
-            glazeButton.disabled = false;
-            glazeButton.classList.remove('opacity-50', 'cursor-not-allowed');
-            glazeButton.classList.add('hover:opacity-90');
-            showStatus("System Online. Chaos Awaits.", false);
-
-        } catch (error) {
-            console.error("Firebase Initialization Error:", error);
-            showStatus(`ERROR: Firebase setup failed: ${error.message}`, true);
-        }
-    }
-
-    // --- Firestore Listeners ---
-
-    function listenToGlobalState(appId) {
-        const globalDocRef = firebase.doc(db, globalStatePath(appId));
-        
-        // Set initial state if it doesn't exist
-        firebase.setDoc(globalDocRef, {
-            kingFid: '8', // Default King F8
-            kingWallet: '0xF8AD...42D8',
-            glazedCount: 140,
-            glazePrice: 0.00019,
-            chaosRate: 10
-        }, { merge: true }).catch(console.error);
-
-        firebase.onSnapshot(globalDocRef, (docSnap) => {
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                document.getElementById('king-fid').textContent = `F${data.kingFid || '?'}`;
-                document.getElementById('king-wallet').textContent = data.kingWallet || '0x...';
-                document.getElementById('glazed-count').textContent = (data.glazedCount || 0).toLocaleString();
-                document.getElementById('glaze-price').textContent = `Ξ${(data.glazePrice || 0).toFixed(5)}`;
-            }
-        }, (error) => {
-            console.error("Error listening to global state:", error);
-            showStatus("WARNING: Global state sync failed.", true);
-        });
-    }
-
-    function listenToUserProfile(appId, userId) {
-        const userDocRef = firebase.doc(db, userProfilePath(appId, userId));
-
-        // Set initial user profile state if it doesn't exist
-        firebase.setDoc(userDocRef, {
-            fid: farcasterContext.fid,
-            wallet: farcasterContext.wallet,
-            donutBalance: 0,
-            ethBalance: 0.1, // Set initial mock ETH for testing purposes
-            lastGlazeTime: firebase.serverTimestamp()
-        }, { merge: true }).catch(console.error);
-
-        firebase.onSnapshot(userDocRef, (docSnap) => {
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                document.getElementById('donut-balance').textContent = (data.donutBalance || 0).toLocaleString();
-                document.getElementById('eth-balance').textContent = `Ξ${(data.ethBalance || 0).toFixed(4)}`;
-            }
-        }, (error) => {
-            console.error("Error listening to user profile:", error);
-            showStatus("WARNING: User profile sync failed.", true);
-        });
-    }
-
-    // --- Main Game Action (Local Simulation) ---
-
-    async function glazeAction() {
-        // NOTE: This function is only for local simulation when running outside a Frame.
-        // In the real Frame, the meta tags handle the transaction via the Vercel serverless function.
-
-        if (!db || !currentUserId || !farcasterContext.fid) {
-            showStatus("Error: System not ready. Wait for initialization.", true);
-            return;
-        }
-
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const globalDocRef = firebase.doc(db, globalStatePath(appId));
-        const userDocRef = firebase.doc(db, userProfilePath(appId, currentUserId));
-        
-        const glazeButton = document.getElementById('glaze-button');
-        glazeButton.textContent = "SIMULATING TX...";
-        glazeButton.disabled = true;
-
-        try {
-            await firebase.runTransaction(db, async (transaction) => {
-                const globalDoc = await transaction.get(globalDocRef);
-                const userDoc = await transaction.get(userDocRef);
-                
-                // Get Current State
-                const currentGlobalState = globalDoc.data() || { glazedCount: 0, glazePrice: 0.00019, kingFid: '0' };
-                const currentUserState = userDoc.data() || { donutBalance: 0, ethBalance: 0.0 };
-                
-                // 1. Transaction Parameters (Mock)
-                const cost = currentGlobalState.glazePrice || 0.00019;
-                const donutReward = 5000;
-                
-                // 2. Mock state updates as if the transaction succeeded
-                const newGlazedCount = (currentGlobalState.glazedCount || 0) + 1;
-                const newEthBalance = (currentUserState.ethBalance || 0) - cost;
-                const newDonutBalance = (currentUserState.donutBalance || 0) + donutReward;
-
-                // 3. Update Global State: New King!
-                transaction.set(globalDocRef, {
-                    ...currentGlobalState,
-                    glazedCount: newGlazedCount,
-                    kingFid: farcasterContext.fid,
-                    kingWallet: formatWallet(farcasterContext.wallet),
-                    lastGlazeTime: firebase.serverTimestamp()
-                });
-
-                // 4. Update User State (Simulating wallet debit and token credit)
-                transaction.set(userDocRef, {
-                    ...currentUserState,
-                    ethBalance: newEthBalance,
-                    donutBalance: newDonutBalance,
-                    lastGlazeTime: firebase.serverTimestamp()
-                });
-            });
-
-            // Visual feedback (glitch effect)
-            const glazedCountElement = document.getElementById('glazed-count');
-            glazedCountElement.classList.add('glitch-text');
-            setTimeout(() => {
-                glazedCountElement.classList.remove('glitch-text');
-            }, 500);
-
-            showStatus(`Local Glaze successful! You are the new King Glazer (F${farcasterContext.fid}).`, false);
-
-        } catch (e) {
-            console.error("Transaction failed:", e);
-            showStatus(`ERROR: Local Glaze failed. ${e.message}`, true);
-        } finally {
-            glazeButton.textContent = "CHAOS GLAZE (Local Test)";
-            glazeButton.disabled = false;
-        }
-    }
-
-
-    // --- Initial Load ---
-
-    window.onload = function() {
-        // Start the Firebase initialization process
-        initializeFirebase();
-    };
-</script>
-
+    </script>
 </body>
 </html>
